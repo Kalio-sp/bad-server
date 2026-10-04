@@ -14,6 +14,7 @@ import {
     orderFormActions,
     orderFormSelector,
 } from '../../services/slice/orderForm'
+import { htmlToText } from '../../utils/sanitize'
 import EditorInput from '../editor-text/editor-input'
 import styles from './order.module.scss'
 
@@ -38,17 +39,21 @@ export function OrderContacts() {
             email: orderPersistData.email,
             phone: orderPersistData.phone,
         })
-    }, [orderPersistData])
+    }, [orderPersistData, setValuesForm])
 
     const handleEditInputChange = (value: string) => {
-        setValuesForm({ ...values, comment: value })
+        setValuesForm({ comment: value })
     }
 
     const handleFormSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault()
         setInfo(values)
         // т.к. на момент отправки запроса данные введенные в поля еще не записаны в store, добавляем в запрос их вручную
-        createOrder({ ...orderPersistData, ...values })
+        createOrder({
+            ...orderPersistData,
+            ...values,
+            comment: htmlToText(values.comment || ''),
+        })
             .unwrap()
             .then((dataResponse) => {
                 resetBasket()

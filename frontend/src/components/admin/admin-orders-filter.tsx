@@ -3,7 +3,9 @@ import { useActionCreators, useDispatch, useSelector } from '@store/hooks'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { fetchOrdersWithFilters } from '../../services/slice/orders/thunk'
 import { AppRoute } from '../../utils/constants'
+import { FiltersOrder } from '../../services/slice/orders/type'
 import Filter from '../filter'
+import { FilterValues } from '../filter/filter'
 import styles from './admin.module.scss'
 import { ordersFilterFields } from './helpers/ordersFilterFields'
 
@@ -15,13 +17,17 @@ export default function AdminFilterOrders() {
     const { updateFilter, clearFilters } = useActionCreators(ordersActions)
     const filterOrderOption = useSelector(ordersSelector.selectFilterOption)
 
-    const handleFilter = (filters: Record<string, any>) => {
-        dispatch(updateFilter({ ...filters, status: filters.status.value }))
+    const handleFilter = (filters: FilterValues) => {
+        const status =
+            typeof filters.status === 'object' ? filters.status.value : ''
+        dispatch(updateFilter({ ...filters, status } as FiltersOrder))
         const queryParams: { [key: string]: string } = {}
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
                 queryParams[key] =
-                    typeof value === 'object' ? value.value : value.toString()
+                    typeof value === 'object'
+                        ? String(value.value)
+                        : value.toString()
             }
         })
         setSearchParams(queryParams)

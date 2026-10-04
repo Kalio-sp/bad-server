@@ -1,10 +1,9 @@
-class BadRequestError extends Error {
-    public statusCode: number
+import AppError from "./app-error";
 
-    constructor(message: string) {
-        super(message)
-        this.statusCode = 400
-    }
+export default class BadRequestError extends AppError {
+  constructor(message: string) {
+    super(400, message);
+
+    this.name = "BadRequestError";
+  }
 }
-
-export default BadRequestError

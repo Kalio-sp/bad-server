@@ -1,10 +1,7 @@
-class UnauthorizedError extends Error {
-    public statusCode: number
+import AppError from "./app-error";
 
-    constructor(message: string) {
-        super(message)
-        this.statusCode = 401
-    }
+export default class UnauthorizedError extends AppError {
+  constructor(message: string) {
+    super(401, message);
+  }
 }
-
-export default UnauthorizedError

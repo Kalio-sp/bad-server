@@ -15,7 +15,14 @@ import { Role } from '../models/user'
 
 const productRouter = Router()
 
-productRouter.get('/', getProducts)
+productRouter.get(
+    '/',
+    (_req, res, next) => {
+        res.set('Cache-Control', 'public, max-age=30')
+        next()
+    },
+    getProducts
+)
 productRouter.post(
     '/',
     auth,

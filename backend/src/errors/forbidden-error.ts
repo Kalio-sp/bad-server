@@ -1,10 +1,9 @@
-class ForbiddenError extends Error {
-    public statusCode: number
+import AppError from "./app-error";
 
-    constructor(message: string) {
-        super(message)
-        this.statusCode = 403
-    }
+class ForbiddenError extends AppError {
+  constructor(message: string) {
+    super(403, message);
+  }
 }
 
-export default ForbiddenError
+export default ForbiddenError;

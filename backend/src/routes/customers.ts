@@ -1,17 +1,30 @@
-import { Router } from 'express'
+import { Router } from "express";
 import {
-    deleteCustomer,
-    getCustomerById,
-    getCustomers,
-    updateCustomer,
-} from '../controllers/customers'
-import auth from '../middlewares/auth'
+  deleteCustomer,
+  getCustomerById,
+  getCustomers,
+  updateCustomer,
+} from "../controllers/customers";
+import auth, { roleGuardMiddleware } from "../middlewares/auth";
+import csrfProtection from "../middlewares/csrf";
+import { validateCustomerUpdate } from "../middlewares/validations";
+import { Role } from "../models/user";
 
-const customerRouter = Router()
+const customerRouter = Router();
 
-customerRouter.get('/', auth, getCustomers)
-customerRouter.get('/:id', auth, getCustomerById)
-customerRouter.patch('/:id', auth, updateCustomer)
-customerRouter.delete('/:id', auth, deleteCustomer)
+customerRouter.use(auth, roleGuardMiddleware(Role.Admin));
 
-export default customerRouter
+customerRouter.get("/", getCustomers);
+
+customerRouter.get("/:id", getCustomerById);
+
+customerRouter.patch(
+  "/:id",
+  csrfProtection,
+  validateCustomerUpdate,
+  updateCustomer,
+);
+
+customerRouter.delete("/:id", csrfProtection, deleteCustomer);
+
+export default customerRouter;

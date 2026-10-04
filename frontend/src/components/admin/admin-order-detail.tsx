@@ -19,10 +19,16 @@ const ActionsButton = () => {
     const number = useParams().number || ''
     const navigate = useNavigate()
     const { updateOrderById } = useActionCreators(ordersActions)
+
     const handleUpdateOrder = (status: StatusType) => {
-        updateOrderById({ status, orderNumber: number })
+        updateOrderById({
+            status,
+            orderNumber: number,
+        })
+
         navigate(-1)
     }
+
     return (
         <>
             <Button
@@ -31,12 +37,14 @@ const ActionsButton = () => {
             >
                 Отменить
             </Button>
+
             <Button
                 extraClass={styles.admin__button_secondary}
                 onClick={() => handleUpdateOrder(StatusType.Delivering)}
             >
                 Доставить
             </Button>
+
             <Button
                 extraClass={styles.admin__button_secondary}
                 onClick={() => handleUpdateOrder(StatusType.Completed)}
@@ -51,6 +59,7 @@ export default function AdminOrderDetail() {
     const navigate = useNavigate()
     const number = useParams().number || ''
     const dispatch = useDispatch()
+
     const orderData = useSelector(selectOrderByNumber(+number))
 
     useEffect(() => {
@@ -67,6 +76,7 @@ export default function AdminOrderDetail() {
                 render: (dataInfo: OrderData) => (
                     <div className={styles.admin__gridCell}>
                         <span>{dataInfo.customer}</span>
+
                         <OpenInNewIcon
                             onClick={() =>
                                 navigate(`/admin/customer/${dataInfo.key}`)
@@ -75,12 +85,18 @@ export default function AdminOrderDetail() {
                     </div>
                 ),
             },
-            { key: 'payment', label: 'Способ оплаты' },
+
+            {
+                key: 'payment',
+                label: 'Способ оплаты',
+            },
+
             {
                 key: 'deliveryAddress',
                 label: 'Адрес доставки',
                 extraClass: styles.admin__gridRowFullWidth,
             },
+
             {
                 key: 'status',
                 label: 'Статус заказа',
@@ -94,21 +110,19 @@ export default function AdminOrderDetail() {
                     </span>
                 ),
             },
-            { key: 'totalAmount', label: 'Сумма заказа' },
+
+            {
+                key: 'totalAmount',
+                label: 'Сумма заказа',
+            },
+
             {
                 key: 'comment',
                 label: 'Комментарий к заказу',
                 extraClass: styles.profile__gridRowFullWidth,
-                render: (dataInfo: OrderData) => (
-                    <>
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: dataInfo.comment,
-                            }}
-                        />
-                    </>
-                ),
+                render: (dataInfo: OrderData) => <div>{dataInfo.comment}</div>,
             },
+
             {
                 key: 'productNames',
                 label: 'Товары',
@@ -124,7 +138,7 @@ export default function AdminOrderDetail() {
                 extraClass: styles.admin__gridRowFullWidth,
             },
         ],
-        [orderData]
+        [orderData, navigate]
     )
 
     if (!orderData) {
@@ -134,7 +148,10 @@ export default function AdminOrderDetail() {
     return (
         <DetailInfo
             header={`Заказ № ${orderData.orderNumber}`}
-            subheader={`от ${format(new Date(orderData.createdAt), 'dd.MM.yyyy')}`}
+            subheader={`от ${format(
+                new Date(orderData.createdAt),
+                'dd.MM.yyyy'
+            )}`}
             data={adapterOrderFromServer(orderData)}
             headers={orderHeaders}
             actions={[ActionsButton]}

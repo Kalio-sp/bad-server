@@ -1,104 +1,101 @@
-/* eslint-disable prefer-arrow-callback */
-import mongoose, { Document, Schema, Types } from 'mongoose'
-import validator from 'validator'
-import { PaymentType, phoneRegExp } from '../middlewares/validations'
-import Counter from './counter'
-import User from './user'
+import mongoose, { Document, Types } from "mongoose";
 
 export enum StatusType {
-    Cancelled = 'cancelled',
-    Completed = 'completed',
-    New = 'new',
-    Delivering = 'delivering',
+  Pending = "pending",
+  Delivering = "delivering",
+  Completed = "completed",
+  Cancelled = "cancelled",
 }
 
 export interface IOrder extends Document {
-    id: Types.ObjectId
-    orderNumber: number
-    status: string
-    totalAmount: number
-    products: Types.ObjectId[]
-    payment: PaymentType
-    customer: Types.ObjectId
-    deliveryAddress: string
-    phone: string
-    comment: string
-    email: string
+  orderNumber: number;
+  status: StatusType;
+  totalAmount: number;
+
+  products: Types.ObjectId[];
+  customer: Types.ObjectId;
+
+  payment: string;
+  phone: string;
+  email: string;
+  comment: string;
+  deliveryAddress: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const orderSchema: Schema = new Schema(
-    {
-        orderNumber: { type: Number, unique: true },
-        status: {
-            type: String,
-            enum: Object.values(StatusType),
-            default: StatusType.New,
-        },
-        totalAmount: { type: Number, required: true },
-        products: [
-            {
-                type: Types.ObjectId,
-                ref: 'product',
-            },
-        ],
-        payment: {
-            type: String,
-            enum: Object.values(PaymentType),
-            required: true,
-        },
-        customer: { type: Types.ObjectId, ref: 'user' },
-        deliveryAddress: { type: String },
-        email: {
-            type: String,
-            required: [true, 'Поле "email" должно быть заполнено'],
-            validate: {
-                validator: (v: string) => validator.isEmail(v),
-                message: 'Поле "email" должно быть валидным email-адресом',
-            },
-        },
-        phone: {
-            type: String,
-            required: [true, 'Поле "phone" должно быть заполнено'],
-            validate: {
-                validator: (v: string) => phoneRegExp.test(v),
-                message: 'Поле "phone" должно быть валидным телефоном.',
-            },
-        },
-        comment: {
-            type: String,
-            default: '',
-        },
+const orderSchema = new mongoose.Schema<IOrder>(
+  {
+    orderNumber: {
+      type: Number,
+      unique: true,
     },
-    { versionKey: false, timestamps: true }
-)
 
-orderSchema.pre('save', async function incrementOrderNumber(next) {
-    const order = this
+    status: {
+      type: String,
+      enum: Object.values(StatusType),
+      default: StatusType.Pending,
+    },
 
-    if (order.isNew) {
-        const counter = await Counter.findOneAndUpdate(
-            {},
-            { $inc: { sequenceValue: 1 } },
-            { new: true, upsert: true }
-        )
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
 
-        order.orderNumber = counter.sequenceValue
-    }
+    products: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "product",
+        required: true,
+      },
+    ],
 
-    next()
-})
+    customer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
 
-orderSchema.post('save', async function updateUserStats(doc) {
-    await User.findById(doc.customer).then(function updateUser(user) {
-        user?.orders.push(doc.id)
-        user?.calculateOrderStats()
-    })
-})
+    payment: {
+      type: String,
+      required: true,
+    },
 
-orderSchema.post('findOneAndDelete', async function updateUserStats(order) {
-    await User.findByIdAndUpdate(order.customer, {
-        $pull: { orders: order._id },
-    }).then((user) => user?.calculateOrderStats())
-})
+    phone: {
+      type: String,
+    },
 
-export default mongoose.model<IOrder>('order', orderSchema)
+    email: {
+      type: String,
+    },
+
+    comment: {
+      type: String,
+      default: "",
+    },
+
+    deliveryAddress: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    versionKey: false,
+    timestamps: true,
+  },
+);
+
+orderSchema.pre("save", async function generateOrderNumber(next) {
+  if (!this.orderNumber) {
+    const lastOrder = await Order.findOne().sort({ orderNumber: -1 });
+
+    this.orderNumber = lastOrder ? lastOrder.orderNumber + 1 : 1;
+  }
+
+  next();
+});
+
+const Order = mongoose.model<IOrder>("order", orderSchema);
+
+export default Order;

@@ -14,14 +14,15 @@ import styles from './profile.module.scss'
 
 const CloseButton = () => {
     const navigate = useNavigate()
+
     return <Button onClick={() => navigate(-1)}>Понятно!</Button>
 }
 
 export default function ProfileOrderDetail() {
     const number = useParams().number || ''
     const dispatch = useDispatch()
+
     const orderData = useSelector(selectOrderByNumber(+number))
-    console.log(orderData)
 
     useEffect(() => {
         if (!orderData) {
@@ -44,7 +45,12 @@ export default function ProfileOrderDetail() {
                     </ul>
                 ),
             },
-            { key: 'totalAmount', label: 'Стоимость' },
+
+            {
+                key: 'totalAmount',
+                label: 'Стоимость',
+            },
+
             {
                 key: 'status',
                 label: 'Статус заказа',
@@ -58,12 +64,18 @@ export default function ProfileOrderDetail() {
                     </span>
                 ),
             },
-            { key: 'payment', label: 'Способ оплаты' },
+
+            {
+                key: 'payment',
+                label: 'Способ оплаты',
+            },
+
             {
                 key: 'deliveryAddress',
                 label: 'Адрес доставки',
                 extraClass: styles.profile__gridRowFullWidth,
             },
+
             {
                 key: 'comment',
                 label: 'Ваш комментарий к заказу',
@@ -71,11 +83,7 @@ export default function ProfileOrderDetail() {
                 render: (dataInfo: OrderData) => (
                     <>
                         {dataInfo.comment ? (
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: dataInfo.comment,
-                                }}
-                            />
+                            <div>{dataInfo.comment}</div>
                         ) : (
                             'Комментариев нет'
                         )}
@@ -93,7 +101,10 @@ export default function ProfileOrderDetail() {
     return (
         <DetailInfo
             header={`Заказ № ${orderData.orderNumber}`}
-            subheader={`от ${format(new Date(orderData.createdAt), 'dd.MM.yyyy')}`}
+            subheader={`от ${format(
+                new Date(orderData.createdAt),
+                'dd.MM.yyyy'
+            )}`}
             data={adapterOrderFromServer(orderData)}
             headers={orderHeaders}
             actions={[CloseButton]}
