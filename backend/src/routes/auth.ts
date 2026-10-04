@@ -1,43 +1,49 @@
-import { Router } from "express";
+import { Router, Request, Response } from 'express'
 import {
-  getCurrentUser,
-  getCurrentUserRoles,
-  login,
-  logout,
-  refreshAccessToken,
-  register,
-  updateCurrentUser,
-} from "../controllers/auth";
-import auth from "../middlewares/auth";
-import csrfProtection from "../middlewares/csrf";
+    getCurrentUser,
+    getCurrentUserRoles,
+    login,
+    logout,
+    refreshAccessToken,
+    register,
+    updateCurrentUser,
+} from '../controllers/auth'
+import auth from '../middlewares/auth'
+import csrfProtection from '../middlewares/csrf'
 import {
-  validateAuthentication,
-  validateUserBody,
-  validateUserUpdate,
-} from "../middlewares/validations";
+    validateAuthentication,
+    validateUserBody,
+    validateUserUpdate,
+} from '../middlewares/validations'
 
-const router = Router();
+const router = Router()
 
-router.post("/login", validateAuthentication, login);
+router.get('/csrf-token', csrfProtection, (req: Request, res: Response) => {
+    res.json({
+        csrfToken: req.csrfToken(),
+    })
+})
 
-router.post("/register", validateUserBody, register);
+router.post('/login', validateAuthentication, login)
 
-router.get("/user", auth, getCurrentUser);
+router.post('/register', validateUserBody, register)
 
-router.get("/roles", auth, getCurrentUserRoles);
+router.get('/user', auth, getCurrentUser)
 
-router.get("/user/roles", auth, getCurrentUserRoles);
+router.get('/roles', auth, getCurrentUserRoles)
 
-router.get("/logout", auth, logout);
+router.get('/user/roles', auth, getCurrentUserRoles)
 
-router.get("/token", refreshAccessToken);
+router.get('/logout', auth, logout)
+
+router.get('/token', refreshAccessToken)
 
 router.patch(
-  "/user",
-  auth,
-  csrfProtection,
-  validateUserUpdate,
-  updateCurrentUser,
-);
+    '/user',
+    auth,
+    csrfProtection,
+    validateUserUpdate,
+    updateCurrentUser
+)
 
-export default router;
+export default router
