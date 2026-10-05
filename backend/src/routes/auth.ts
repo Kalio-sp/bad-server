@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express'
+import csrfProtection from '../middlewares/csrf'
 import {
     getCurrentUser,
     getCurrentUserRoles,
@@ -9,7 +10,6 @@ import {
     updateCurrentUser,
 } from '../controllers/auth'
 import auth from '../middlewares/auth'
-import csrfProtection from '../middlewares/csrf'
 import {
     validateAuthentication,
     validateUserBody,
@@ -45,5 +45,11 @@ router.patch(
     validateUserUpdate,
     updateCurrentUser
 )
+
+router.get('/csrf-token', csrfProtection, (req, res) => {
+    res.json({
+        csrfToken: req.csrfToken(),
+    })
+})
 
 export default router
