@@ -6,6 +6,8 @@ services:
       - frontend/.env
     volumes:
       - frontend:/app/frontend/dist
+    networks:
+      - internal
 
   mongo:
     image: mongo
@@ -57,3 +59,4 @@ volumes:
 
 networks:
   internal:
+    driver: bridge

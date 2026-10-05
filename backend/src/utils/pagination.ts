@@ -1,7 +1,7 @@
 export default function parsePagination(
     query: { page?: unknown; limit?: unknown },
     defaultLimit = 10,
-    maxLimit = 20
+    maxLimit = 10
 ) {
     const page = Math.max(1, Math.floor(Number(query.page)) || 1)
     const limit = Math.min(

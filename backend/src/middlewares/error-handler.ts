@@ -1,8 +1,8 @@
 import { ErrorRequestHandler } from 'express'
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-    const statusCode = err.statusCode || 500
-
+    const statusCode =
+        err.name === 'MulterError' ? 400 : err.statusCode || err.status || 500
     if (statusCode >= 500) {
         console.error(err.message)
     }

@@ -59,13 +59,16 @@ class Api {
     // CSRF-токен выдаёт сервер (GET /csrf-token), он привязан к cookie _csrf
     private async getCsrfToken(force = false): Promise<string> {
         if (!this.csrfToken || force) {
-            const res = await fetch(`${this.baseUrl}/csrf-token`, {
+            const res = await fetch(`${this.baseUrl}/auth/csrf-token`, {
                 method: 'GET',
                 credentials: 'include',
             })
+
             const data = await this.handleResponse<{ csrfToken: string }>(res)
+
             this.csrfToken = data.csrfToken
         }
+
         return this.csrfToken
     }
 

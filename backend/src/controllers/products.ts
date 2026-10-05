@@ -12,7 +12,7 @@ import parsePagination from '../utils/pagination'
 // GET /product
 const getProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { page, limit } = parsePagination(req.query, 5)
+        const { page, limit } = parsePagination(req.query, 5, 20)
         const options = {
             skip: (page - 1) * limit,
             limit,
