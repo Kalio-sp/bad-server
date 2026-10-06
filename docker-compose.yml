@@ -2,10 +2,6 @@ services:
   frontend:
     build:
       context: frontend
-    env_file:
-      - frontend/.env
-    volumes:
-      - frontend:/app/frontend/dist
     networks:
       - internal
 
@@ -44,7 +40,6 @@ services:
     ports:
       - 80:80
     volumes:
-      - frontend:/var/app
       - public:/var/public
     depends_on:
       - frontend
@@ -53,7 +48,6 @@ services:
       - internal
 
 volumes:
-  frontend:
   public:
   db:
 
