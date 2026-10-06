@@ -1,5 +1,6 @@
 services:
   frontend:
+    restart: always
     build:
       context: frontend
     networks:
@@ -45,6 +46,7 @@ services:
       - mongo
 
   server:
+    restart: always
     build:
       context: nginx
     ports:
