@@ -26,23 +26,20 @@ jobs:
           node-version: 18.x
 
       - name: Get testing lib
-        run: set -eu && git clone --depth 1 $REP_TESTS $DIR_TESTS
+        run: |
+          set -eu
+          git clone --depth 1 $REP_TESTS $DIR_TESTS
 
       - name: Start project
         run: bash $DIR_TESTS/bin/start_project.sh
 
-      - name: Wait backend
+      - name: Wait project
         run: |
-          for i in {1..30}; do
-            if curl -f http://localhost/api/auth/csrf-token; then
-              echo "Backend ready"
-              exit 0
-            fi
-            echo "Waiting..."
-            sleep 2
-          done
-          echo "Backend did not start"
-          exit 1
+          sleep 20
+          docker compose ps
+          docker compose logs --tail=50 backend
+          docker compose logs --tail=50 server
+          curl -I http://localhost
 
       - name: Run tests
         run: bash $DIR_TESTS/bin/run.sh
