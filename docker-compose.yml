@@ -6,10 +6,11 @@ services:
     networks:
       - internal
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 5s
 
   mongo:
     image: mongo

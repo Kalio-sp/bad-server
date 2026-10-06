@@ -1,24 +1,38 @@
-import { CookieOptions } from 'express'
-import ms from 'ms'
+import 'dotenv/config'
 
-export const { PORT = '3000' } = process.env
-export const { DB_ADDRESS = 'mongodb://127.0.0.1:27017/weblarek' } = process.env
-export const { JWT_SECRET = 'JWT_SECRET' } = process.env
+import crypto from 'crypto'
+
+const {
+    DB_ADDRESS = 'mongodb://localhost:27017/weblarek',
+    AUTH_ACCESS_TOKEN_SECRET,
+    AUTH_REFRESH_TOKEN_SECRET,
+} = process.env
+
+// Если секреты не заданы в окружении (нет .env, например в CI),
+// генерируем случайные, чтобы jwt.sign не падал с
+// "secretOrPrivateKey must have a value".
+const accessSecret =
+    AUTH_ACCESS_TOKEN_SECRET || crypto.randomBytes(32).toString('hex')
+const refreshSecret =
+    AUTH_REFRESH_TOKEN_SECRET || crypto.randomBytes(32).toString('hex')
+
 export const ACCESS_TOKEN = {
-    secret: process.env.AUTH_ACCESS_TOKEN_SECRET || 'secret-dev',
-    expiry: process.env.AUTH_ACCESS_TOKEN_EXPIRY || '10m',
+    secret: accessSecret,
+    expiry: '15m',
 }
+
 export const REFRESH_TOKEN = {
-    secret: process.env.AUTH_REFRESH_TOKEN_SECRET || 'secret-dev',
-    expiry: process.env.AUTH_REFRESH_TOKEN_EXPIRY || '7d',
+    secret: refreshSecret,
+    expiry: '7d',
     cookie: {
         name: 'refreshToken',
         options: {
             httpOnly: true,
-            sameSite: 'lax',
-            secure: false,
-            maxAge: ms(process.env.AUTH_REFRESH_TOKEN_EXPIRY || '7d'),
-            path: '/',
-        } as CookieOptions,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict' as const,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        },
     },
 }
+
+export { DB_ADDRESS }
