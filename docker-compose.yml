@@ -22,8 +22,18 @@ services:
     restart: always
     build:
       context: backend
-    env_file:
-      - backend/.env
+    # backend/.env добавлен в .gitignore и в CI его нет,
+    # поэтому переменные задаём здесь (со значениями по умолчанию).
+    environment:
+      PORT: 3000
+      DB_ADDRESS: ${DB_ADDRESS:-mongodb://root:example@mongo:27017/weblarek?authSource=admin}
+      UPLOAD_PATH: ${UPLOAD_PATH:-images}
+      UPLOAD_PATH_TEMP: ${UPLOAD_PATH_TEMP:-temp}
+      ORIGIN_ALLOW: ${ORIGIN_ALLOW:-http://localhost}
+      AUTH_REFRESH_TOKEN_EXPIRY: ${AUTH_REFRESH_TOKEN_EXPIRY:-7d}
+      AUTH_ACCESS_TOKEN_EXPIRY: ${AUTH_ACCESS_TOKEN_EXPIRY:-10m}
+      AUTH_ACCESS_TOKEN_SECRET: ${AUTH_ACCESS_TOKEN_SECRET:-dev-access-secret-change-me-9f8c7d6a5b4e3f2a1c0v9b8n7m6k5j4h}
+      AUTH_REFRESH_TOKEN_SECRET: ${AUTH_REFRESH_TOKEN_SECRET:-dev-refresh-secret-change-me-q1w2e3r4t5y6u7i8o9p0a1s2d3f4g5h6}
     volumes:
       - ./backend/src:/app/src
       - public:/app/src/public

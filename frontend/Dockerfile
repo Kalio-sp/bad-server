@@ -2,6 +2,11 @@ FROM node:22-alpine AS build
 
 WORKDIR /app/frontend
 
+# frontend/.env в .gitignore и в CI отсутствует,
+# поэтому адрес API передаём явно (через nginx на 80 порту)
+ARG VITE_API_ORIGIN=http://localhost/api
+ENV VITE_API_ORIGIN=$VITE_API_ORIGIN
+
 COPY package*.json ./
 
 RUN npm ci
