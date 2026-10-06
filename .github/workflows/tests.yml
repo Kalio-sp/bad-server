@@ -41,5 +41,9 @@ jobs:
           docker compose logs --tail=50 server
           curl -I http://localhost
 
+      - name: Backend logs
+        run: |
+          docker compose logs --tail=200 backend
+
       - name: Run tests
         run: bash $DIR_TESTS/bin/run.sh
