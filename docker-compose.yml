@@ -5,6 +5,11 @@ services:
       context: frontend
     networks:
       - internal
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   mongo:
     image: mongo
@@ -32,7 +37,7 @@ services:
       AUTH_REFRESH_TOKEN_EXPIRY: ${AUTH_REFRESH_TOKEN_EXPIRY:-7d}
       AUTH_ACCESS_TOKEN_EXPIRY: ${AUTH_ACCESS_TOKEN_EXPIRY:-10m}
       AUTH_ACCESS_TOKEN_SECRET: ${AUTH_ACCESS_TOKEN_SECRET:-dev-access-secret-change-me-9f8c7d6a5b4e3f2a1c0v9b8n7m6k5j4h}
-      AUTH_REFRESH_TOKEN_SECRET: ${AUTH_REFRESH_TOKEN_SECRET:-dev-refresh-secret-change-me-q1w2e3r4t5y6u7i8o9p0a1s2d3f4g5h6}
+      AUTH_REFRESH_TOKEN_SECRET: ${AUTH_REFRESH_TOKEN_SECRET:-dev-refresh-token-secret}
     volumes:
       - ./backend/src:/app/src
       - public:/app/src/public
@@ -54,7 +59,7 @@ services:
       - public:/var/public
     depends_on:
       frontend:
-        condition: service_started
+        condition: service_healthy
       backend:
         condition: service_started
     networks:
