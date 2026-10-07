@@ -1,25 +1,21 @@
 import 'dotenv/config'
 
-import crypto from 'crypto'
-
 const {
     DB_ADDRESS = 'mongodb://localhost:27017/weblarek',
     AUTH_ACCESS_TOKEN_SECRET,
     AUTH_REFRESH_TOKEN_SECRET,
 } = process.env
 
-const accessSecret =
-    AUTH_ACCESS_TOKEN_SECRET || crypto.randomBytes(32).toString('hex')
-const refreshSecret =
-    AUTH_REFRESH_TOKEN_SECRET || crypto.randomBytes(32).toString('hex')
+const accessSecret = AUTH_ACCESS_TOKEN_SECRET || 'secret-dev'
+const refreshSecret = AUTH_REFRESH_TOKEN_SECRET || 'secret-dev-refresh'
 
 export const ACCESS_TOKEN = {
-    secret: AUTH_ACCESS_TOKEN_SECRET,
+    secret: accessSecret,
     expiry: '15m',
 }
 
 export const REFRESH_TOKEN = {
-    secret: AUTH_REFRESH_TOKEN_SECRET,
+    secret: refreshSecret,
     expiry: '7d',
     cookie: {
         name: 'refreshToken',
