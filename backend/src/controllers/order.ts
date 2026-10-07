@@ -30,10 +30,13 @@ export const getOrders = async (
 
         const filters: FilterQuery<Partial<IOrder>> = {}
 
-        if (
-            typeof status === 'string' &&
-            Object.values(StatusType).includes(status as StatusType)
-        ) {
+        if (status) {
+            if (
+                typeof status !== 'string' ||
+                !Object.values(StatusType).includes(status as StatusType)
+            ) {
+                return next(new BadRequestError('Недопустимый статус заказа'))
+            }
             filters.status = status
         }
 
